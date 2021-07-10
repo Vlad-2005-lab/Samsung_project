@@ -100,7 +100,7 @@ public class AddNew extends AppCompatActivity {
                 connection.setDoInput(true);
                 // Разрешение вывода соединению
                 connection.setDoOutput(true);
-                // Отключение кеширования
+                // Отключение кешированияы
                 connection.setUseCaches(false);
 
                 // Задание запросу типа POST
@@ -110,50 +110,51 @@ public class AddNew extends AppCompatActivity {
                 connection.setRequestProperty("Connection", "Keep-Alive");
                 connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+
 
                 // Формирование multipart контента
                 for (int i = 1; i <= list.size(); ++i) {
-                    try {
-                        // Создание потока для записи в соединение
-                        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                    // Создание потока для записи в соединение
+                    outputStream = new DataOutputStream(connection.getOutputStream());
 
-                        // Начало контента
-                        outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-                        // Заголовок элемента формы
-                        outputStream.writeBytes("Content-Disposition: form-data; name=\"" +
-                                "file" + i + "\"; filename=\"" + list.get(i-1) + "\"" + lineEnd);
-                        // Тип данных элемента формы
-                        outputStream.writeBytes("Content-Type: image/jpeg" + lineEnd);
-                        // Конец заголовка
-                        outputStream.writeBytes(lineEnd);
+                    // Начало контента
+                    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+                    // Заголовок элемента формы
+                    outputStream.writeBytes("Content-Disposition: form-data; name=\"" +
+                            "file" + i + "\"; filename=\"" + list.get(i-1) + "\"" + lineEnd);
+                    // Тип данных элемента формы
+                    outputStream.writeBytes("Content-Type: image/jpeg" + lineEnd);
+                    // Конец заголовка
+                    outputStream.writeBytes(lineEnd);
 
-                        // Поток для считывания файла в оперативную память
-                        FileInputStream fileInputStream = new FileInputStream(new File(list.get(i-1)));
+                    // Поток для считывания файла в оперативную память
+                    FileInputStream fileInputStream = new FileInputStream(new File(list.get(i-1)));
 
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    buffer = new byte[bufferSize];
+
+                    // Считывание файла в оперативную память и запись его в соединение
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                    while (bytesRead > 0) {
+                        outputStream.write(buffer, 0, bufferSize);
                         bytesAvailable = fileInputStream.available();
                         bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                        buffer = new byte[bufferSize];
-
-                        // Считывание файла в оперативную память и запись его в соединение
                         bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-                        while (bytesRead > 0) {
-                            outputStream.write(buffer, 0, bufferSize);
-                            bytesAvailable = fileInputStream.available();
-                            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-                        }
-
-                        // Конец элемента формы
-                        outputStream.writeBytes(lineEnd);
-                        outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-                        fileInputStream.close();
-                        outputStream.flush();
-                        outputStream.close();
-                    } catch (Exception ex){
-                        System.out.println("!!!!!!!!!!!!!!!!!!!!" + ex);
                     }
+
+                    // Конец элемента формы
+                    outputStream.writeBytes(lineEnd);
+                    outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+                    fileInputStream.close();
+                    outputStream.flush();
+//                    outputStream.close();
+                    System.out.println("++++++++++++++++++++++++++++++++++");
                 }
+//                outputStream.flush();
+                outputStream.close();
                 // Получение ответа от сервера
                 int serverResponseCode = connection.getResponseCode();
                 // Закрытие соединений и потоков

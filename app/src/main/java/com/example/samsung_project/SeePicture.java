@@ -28,17 +28,22 @@ public class SeePicture extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.seepicture);
-        Objects.requireNonNull(getSupportActionBar()).hide();
-        WebView webview = (WebView) findViewById(R.id.webview);
-        String folderToOpen = (getApplicationContext().getFileStreamPath("push.jpg").getPath()).toString();
-        webview.loadUrl(folderToOpen);
-        webview.getSettings().setSupportZoom(true);
-        webview.setInitialScale(100);
-        webview.getSettings().setBuiltInZoomControls(true);
-        webview.setPadding(0, 0, 0, 0);
-        webview.setScrollbarFadingEnabled(true);
-        webview.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        webview.getSettings().setAllowFileAccess(true);
+        while (true){
+            try {
+                Objects.requireNonNull(getSupportActionBar()).hide();
+                WebView webview = (WebView) findViewById(R.id.webview);
+                String folderToOpen = (getApplicationContext().getFileStreamPath("push.jpg").getPath());
+                webview.loadUrl(folderToOpen);
+                webview.getSettings().setSupportZoom(true);
+                webview.setInitialScale(100);
+                webview.getSettings().setBuiltInZoomControls(true);
+                webview.setPadding(0, 0, 0, 0);
+                webview.setScrollbarFadingEnabled(true);
+                webview.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+                webview.getSettings().setAllowFileAccess(true);
+                break;
+            } catch (Exception ex){}
+        }
     }
 
     @Override
